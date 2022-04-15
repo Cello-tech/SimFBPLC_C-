@@ -371,15 +371,15 @@ namespace SimFBPLC
 
     public class SIM_PLC
     {
-        public event DataReceivedEventHandler DataReceived;
-        public delegate void DataReceivedEventHandler(string Data);
+        public event DataReceivedEventHandler DataReceived;//宣告新event 傳出給給主程式
+        public delegate void DataReceivedEventHandler(string Data);//宣告委派傳出參數
         string Rx_Buffer = "";
         public SerialPort PLC_COM;
 
         public SIM_PLC()
         {
             PLC_COM = new System.IO.Ports.SerialPort("COM1", 9600, Parity.None, 8, StopBits.One);
-            PLC_COM.DataReceived += new SerialDataReceivedEventHandler(PLC_ONComm);
+            PLC_COM.DataReceived += new SerialDataReceivedEventHandler(PLC_ONComm);//宣告原來 RS232的事件 PLC_ONComm
         }
 
         public void SetCommSetting(string comport, string setting)
