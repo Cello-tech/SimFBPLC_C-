@@ -92,10 +92,7 @@ namespace SimFBPLC
 
         [System.Runtime.InteropServices.DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
-
-        //public event DataReceivedEventHandler DataReceived;
-
-        public delegate void DataReceivedEventHandler(string Data);
+                
 
         CUDPServer UdpServer = new CUDPServer();
         public SIM_PLC simPLC = new SIM_PLC();
