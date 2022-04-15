@@ -68,7 +68,7 @@ namespace SimFBPLC
                 string message = Encoding.UTF8.GetString(buffer, 0, length);
                 //Console.WriteLine(point.ToString() + message);
                 //UDPReceived(message);
-                DataReceived?.Invoke(message);
+                DataReceived?.Invoke(message);//
 
             }
         }
