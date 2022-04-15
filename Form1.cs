@@ -109,7 +109,7 @@ namespace SimFBPLC
         {
             if (UdpServer != null)
             {
-                UdpServer.UPDDataReceived += UDPReceived;
+                UdpServer.DataReceived += UDPReceived;
             }
             if (simPLC != null)
             {
