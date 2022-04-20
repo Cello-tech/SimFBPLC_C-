@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
 namespace SimFBPLC
 {
     public partial class Form1 : Form
@@ -36,20 +37,28 @@ namespace SimFBPLC
         public string RW_String;
         public string Output_String;
 
-        public static bool[] X_Bit = new bool[10001];
-        public static bool[] Y_Bit = new bool[10001];
-        public static bool[] M_Bit = new bool[10001];
-        public static int[] RR_Word = new int[10001];
-        public static int[] RW_Word = new int[10001];
-        public static int[] RW_Word_Writed = new int[10001];
-        public static int[] RR_Word_Writed = new int[10001];
-        public static int[] DD_Word = new int[10001];
+        public static bool[] X_Bit = new bool[1000];
+        public static bool[] X_Bit_old = new bool[1000];
+        public static bool[] Y_Bit = new bool[1000];
+        public static bool[] Y_Bit_old = new bool[1000];
+        public static bool[] M_Bit = new bool[10000];
+        public static bool[] M_Bit_old = new bool[10000];
+        public static int[] RR_Word = new int[10000];
+        public static int[] RR_Word_old = new int[10000];
+        public static int[] RW_Word = new int[10000];
+        public static int[] RW_Word_old = new int[10000];
+        public static int[] RW_Word_Writed = new int[10000];
+        public static int[] RW_Word_Writed_old = new int[10000];
+        public static int[] RR_Word_Writed = new int[10000];
+        public static int[] RR_Word_Writed_old = new int[10000];
+        public static int[] DD_Word = new int[10000];
+        public static int[] DD_Word_old = new int[10000];
 
         public int index;
         public bool FirstFlag = false;
         public string sComport, sCommSetting;
         public string FormCaption;
-        public string[] X_Name = new string[10001], Y_Name = new string[10001], M_Name = new string[10001], RR_Name = new string[10001], RW_Name = new string[10001];
+        public string[] X_Name = new string[1000], Y_Name = new string[1000], M_Name = new string[1000], RR_Name = new string[10000], RW_Name = new string[10000];
         public bool MtoY_Flag, bTopmost;
         public char STX = System.Convert.ToChar(2);
         public char ETX = System.Convert.ToChar(3);
@@ -82,7 +91,8 @@ namespace SimFBPLC
 
         public bool ActionFlag;
         public int delay = 0;
-
+        public bool threadStop = false;
+        //public bool threadStop = false;
         System.Timers.Timer aa = new System.Timers.Timer();
         public SAction[] CAction = new SAction[301];
 
@@ -92,7 +102,7 @@ namespace SimFBPLC
 
         [System.Runtime.InteropServices.DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
-                
+
 
         CUDPServer UdpServer = new CUDPServer();
         public SIM_PLC simPLC = new SIM_PLC();
@@ -184,14 +194,14 @@ namespace SimFBPLC
             for (i = 0; i <= 191; i++)
             {
                 R_Read[i] = new TextBox();
-                SetUpTxbObject(ref R_Read[i], "txtRR" + i.ToString("D2"), "0", j * 50, k * 25, 58, 24, Color.LightGreen);
+                SetUpTxtObject(ref R_Read[i], "txtRR" + i.ToString("D2"), "0", j * 50, k * 25, 58, 24, Color.LightGreen);
                 R_Read[i].KeyPress += R_Read_KeyPress;
                 R_Read[i].MouseMove += ShowRRName;
                 // AddHandler R_Read[i].MouseEnter, AddressOf ShowToolTip
                 tabPageRRead.Controls.Add(R_Read[i]);
 
                 R_Write[i] = new TextBox();
-                SetUpTxbObject(ref R_Write[i], "txtRW" + i.ToString("D2"), "0", j * 50, k * 25, 58, 24, Color.AliceBlue);
+                SetUpTxtObject(ref R_Write[i], "txtRW" + i.ToString("D2"), "0", j * 50, k * 25, 58, 24, Color.AliceBlue);
                 R_Write[i].KeyPress += R_Write_KeyPress;
                 R_Write[i].MouseMove += ShowRWName;
 
@@ -231,7 +241,7 @@ namespace SimFBPLC
 
 
             Timer1.Interval = 100;
-            Timer1.Enabled = true;
+            //Timer1.Enabled = true;
             FirstFlag = true;
             Timer2.Interval = 1000;
             Timer2.Enabled = true;
@@ -241,6 +251,8 @@ namespace SimFBPLC
             aa.AutoReset = true;
             aa.Elapsed += RunAction;
             aa.Start();
+            //DataClone();
+            InitThread();
         }
         public void SetAction(SAction[] SA)
         {
@@ -323,7 +335,17 @@ namespace SimFBPLC
                         DTime = 1;
                 }
                 else
-                    Target = Convert.ToInt32(SA[i].TargetValue);
+                //Target = Convert.ToInt32(SA[i].TargetValue);
+                {
+                    try
+                    {
+                        Target = Convert.ToInt32(SA[i].TargetValue);
+                    }
+                    catch 
+                    {
+                        Target = 0;
+                    }
+                }
                 switch (srcstr)
                 {
                     case "RR":
@@ -445,7 +467,7 @@ namespace SimFBPLC
 
                             if (SA[i].Source.Length == 6)
                             {
-                                subCommand = SA[i].Source.Substring(5 , 1);
+                                subCommand = SA[i].Source.Substring(5, 1);
                                 switch (subCommand.ToUpper())
                                 {
                                     case "I":
@@ -469,7 +491,7 @@ namespace SimFBPLC
                                         CSetTimer[i].SetTimerBit(ActionFlag, SrcBit, ref X_Bit[destindex], set_cond, DTime);
                                         string str = "CSetTimer[" + i + "].SetTimerBit(" + ActionFlag + "," + SrcBit + ", X_Bit[" + destindex + "]," + set_cond + "," + DTime + ")";
                                         Debug.Print(str);
-                                        str = "X_Bit[" + destindex + "] ="+ X_Bit[destindex];
+                                        str = "X_Bit[" + destindex + "] =" + X_Bit[destindex];
                                         Debug.Print(str);
                                         break;
                                     }
@@ -715,7 +737,7 @@ namespace SimFBPLC
             {
                 case "R":
                     {
-                        j = Convert.ToInt32(sa.Substring(2 - 1, 5));
+                        j = Convert.ToInt32(sa.Substring(2 - 1, 4));
                         if (j >= 1000 & j < 1100)
                         {
                             RRindex = j;
@@ -1368,7 +1390,7 @@ namespace SimFBPLC
             obj.BackColor = iC;
 
         }
-        private void SetUpTxbObject(ref TextBox obj, string sName, string sText, int iX, int iY, int iW, int iH, Color iC)
+        private void SetUpTxtObject(ref TextBox obj, string sName, string sText, int iX, int iY, int iW, int iH, Color iC)
         {
             obj.Name = sName;
             obj.Text = sText;
@@ -1424,13 +1446,14 @@ namespace SimFBPLC
         }
         private void ShowRRName(System.Object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Button btn = (Button)sender;
-            lblRRName.Text = RR_Name[btn.TabIndex];
+            //Button btn = (Button)sender;
+            TextBox text = (TextBox)sender;
+            lblRRName.Text = RR_Name[text.TabIndex];
         }
         private void ShowRWName(System.Object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Button btn = (Button)sender;
-            lblRWName.Text = RW_Name[btn.TabIndex];
+            TextBox text = (TextBox)sender;
+            lblRWName.Text = RW_Name[text.TabIndex];
         }
         private void X_Status_Click(object sender, System.EventArgs e)
         {
@@ -1442,10 +1465,10 @@ namespace SimFBPLC
             //index = Convert.ToInt32(ctrl.Name.Substring(2-1, ctrl.Text.Length - 1));
             index = Convert.ToInt32(ctrl.Name.Substring(2 - 1, ctrl.Text.Length - 1));
             X_Bit[index] = !X_Bit[index];
-            if (X_Bit[index])
-                ctrl.BackColor = Color.Lime;
-            else
-                ctrl.BackColor = Color.Red;
+            //if (X_Bit[index])
+            //    ctrl.BackColor = Color.Lime;
+            //else
+            //    ctrl.BackColor = Color.Red;
         }
         private void Y_Status_Click(object sender, System.EventArgs e)
         {
@@ -1454,12 +1477,12 @@ namespace SimFBPLC
             ctrl = (Button)sender;
             if (ctrl.Text.Length < 2)
                 return;
-            index = Convert.ToInt32(ctrl.Name.Substring(1 - 1, ctrl.Text.Length - 1));
+            index = Convert.ToInt32(ctrl.Name.Substring(1 , ctrl.Text.Length - 1));
             Y_Bit[index] = !Y_Bit[index];
-            if (Y_Bit[index])
-                ctrl.BackColor = Color.Lime;
-            else
-                ctrl.BackColor = Color.Red;
+            //if (Y_Bit[index])
+            //    ctrl.BackColor = Color.Lime;
+            //else
+            //    ctrl.BackColor = Color.Red;
         }
         private void M_Status_Click(object sender, System.EventArgs e)
         {
@@ -1471,10 +1494,10 @@ namespace SimFBPLC
                 return;
             index = Convert.ToInt32(ctrl.Name.Substring(1, ctrl.Text.Length - 1));
             M_Bit[index] = !M_Bit[index];
-            if (M_Bit[index])
-                ctrl.BackColor = Color.Lime;
-            else
-                ctrl.BackColor = Color.Red;
+            //if (M_Bit[index])
+            //    ctrl.BackColor = Color.Lime;
+            //else
+            //    ctrl.BackColor = Color.Red;
         }
 
         private void ReadPLCINI(string sfile)
@@ -1623,6 +1646,8 @@ namespace SimFBPLC
                 else
                     btnAction.BackColor = Color.LightGray;
             }
+            DataClone();
+
         }
         private void Timer2_Tick(System.Object sender, System.EventArgs e)
         {
@@ -1913,6 +1938,19 @@ namespace SimFBPLC
             return sstr;
         }
 
+        private void DataClone()
+        {
+            System.Buffer.BlockCopy(X_Bit, 0, X_Bit_old, 0, 1000);
+            System.Buffer.BlockCopy(Y_Bit, 0, Y_Bit_old, 0, 1000);
+            if (MtoY_Flag)
+                System.Buffer.BlockCopy(M_Bit, 0, Y_Bit, 0, 1000);
+            System.Buffer.BlockCopy(M_Bit, 0, M_Bit_old, 0, 1000);
+            System.Buffer.BlockCopy(RR_Word, 0, RR_Word_old, 0, 1000);
+            System.Buffer.BlockCopy(RW_Word, 0, RW_Word_old, 0, 1000);
+            System.Buffer.BlockCopy(RW_Word_Writed, 0, RW_Word_Writed_old, 0, 1000);
+            System.Buffer.BlockCopy(RR_Word_Writed, 0, RR_Word_Writed_old, 0, 1000);
+            System.Buffer.BlockCopy(DD_Word, 0, DD_Word_old, 0, 1000);
+        }
         public struct SAction
         {
             public string Source;
@@ -1922,19 +1960,124 @@ namespace SimFBPLC
             public string TargetValue;
         }
 
-        public static void InitThread()
+        public void InitThread()
         {
-            //建立多執行緒
-            ProcessThread = new Thread(new ThreadStart(ProcessThreading));
+            //建立多執行緒 
+            ProcessThread = new Thread(new ThreadStart(StatusThreading));
             ProcessThread.IsBackground = true;
             ProcessThread.Start();
         }
-        public static void ProcessThreading()
-        {
-            //IO讀寫
-            //Motion位置
 
-            //claire
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ReadPLCIOName(INIpath + "\\SIMFBPLC.INI");
+            WritePLCLog(INIpath + "\\PLCIOSAVE.INI");
+            //WritePLCINI(@".\SIMFBPLC.INI");
+            WritePLCINI(INIpath + "\\SIMFBPLC.INI");
+            simPLC.Close();
+            System.Environment.Exit(0);
         }
+
+        public void StatusThreading()
+        {
+            while (!threadStop)
+            {
+                for (int i = 0; i <= 95; i++)
+                {
+                    if (X_Bit[i] != X_Bit_old[i])
+                        UpdateX_Bit(i);
+                }
+                for (int i = 0; i <= 191; i++)
+                {
+                    if (Y_Bit[i] != Y_Bit_old[i])
+                        UpdateY_Bit(i);
+                }
+                for (int i = 0; i <= 191; i++)
+                {
+                    if (M_Bit[i] != M_Bit_old[i])
+                        UpdateM_Bit(i);
+                }
+                DataClone();
+                Thread.Sleep(100);
+            }
+        }
+        private void UpdateX_Bit(int index)
+        {
+            if (X_Status[index].InvokeRequired)
+            {
+                X_Status[index].Invoke(new Action(() =>
+                {
+                    UpdateX_Bit(index);
+                }
+                ));
+            }
+            else
+            {
+                if (X_Bit[index])
+                    X_Status[index].BackColor = Color.Lime;
+                else
+                    X_Status[index].BackColor = Color.Red;
+            }
+        }
+        private void UpdateY_Bit(int index)
+        {
+            if (Y_Status[index].InvokeRequired)
+            {
+                Y_Status[index].Invoke(new Action(() =>
+                {
+                    UpdateY_Bit(index);
+                }
+                ));
+            }
+            else
+            {
+                if (Y_Bit[index])
+                    Y_Status[index].BackColor = Color.Lime;
+                else
+                    Y_Status[index].BackColor = Color.Red;
+            }
+
+        }
+        private void UpdateM_Bit(int index)
+        {
+            if (M_Status[index].InvokeRequired)
+            {
+                M_Status[index].Invoke(new Action(() =>
+                {
+                    UpdateM_Bit(index);
+                }
+                ));
+            }
+            else
+            {
+                if (M_Bit[index])
+                    M_Status[index].BackColor = Color.Lime;
+                else
+                    M_Status[index].BackColor = Color.Red;
+            }
+
+        }
+        private void WritePLCINI(string sfile)
+        {
+            WriteProgData("COMM_SETUP", "COMPORT", (cmoCommPort.SelectedIndex + 1).ToString(), sfile);
+            WriteProgData("COMM_SETUP", "SETTING", sCommSetting, sfile);
+            WriteProgData("PROGRAM", "TOPMOST", Bol2Str(chkOnTop.Checked), sfile);
+            WriteProgData("PROGRAM", "MTOYFLAG", Bol2Str(chkMtoY.Checked), sfile);
+            WriteProgData("PROGRAM", "XINDEX", txtXInputIndex.Text, sfile);
+            WriteProgData("PROGRAM", "MINDEX", txtMOutputIndex.Text, sfile);
+            WriteProgData("PROGRAM", "YINDEX", txtYOutputIndex.Text, sfile);
+            WriteProgData("PROGRAM", "RRINDEX", txtReadWordIndex.Text, sfile);
+            WriteProgData("PROGRAM", "RWINDEX", txtWriteWordIndex.Text, sfile);
+            WriteProgData("PROGRAM", "DELAY", CmdDelay.ToString(), sfile);
+        }
+        //private void Form1_Disposed(object sender, System.EventArgs e)
+        //{
+        //    ReadPLCIOName(INIpath + "\\SIMFBPLC.INI");
+        //    WritePLCLog(INIpath + "\\PLCIOSAVE.INI");
+        //    //WritePLCINI(@".\SIMFBPLC.INI");
+        //    WritePLCINI(INIpath + "\\SIMFBPLC.INI");
+        //    simPLC.Close();
+        //    System.Environment.Exit(0);
+        //}
     }
 }
