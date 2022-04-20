@@ -89,6 +89,7 @@ namespace SimFBPLC
         public bool PLC_DiDepSH;
         public bool PLC_DoPockInposition;
 
+        Stopwatch[] WDog = new Stopwatch[10];
         public bool ActionFlag;
         public int delay = 0;
         public bool threadStop = false;
@@ -252,6 +253,16 @@ namespace SimFBPLC
             aa.Elapsed += RunAction;
             aa.Start();
             //DataClone();
+            if (simPLC.PLC_COM.IsOpen)
+            {
+                btnOpenComm.BackColor = Color.Lime;
+                btnCloseComm.BackColor = Color.LightGray;
+            }
+            else
+            {
+                btnCloseComm.BackColor = Color.Lime;
+                btnOpenComm.BackColor = Color.LightGray;
+            }
             InitThread();
         }
         public void SetAction(SAction[] SA)
@@ -341,7 +352,7 @@ namespace SimFBPLC
                     {
                         Target = Convert.ToInt32(SA[i].TargetValue);
                     }
-                    catch 
+                    catch
                     {
                         Target = 0;
                     }
@@ -1477,7 +1488,7 @@ namespace SimFBPLC
             ctrl = (Button)sender;
             if (ctrl.Text.Length < 2)
                 return;
-            index = Convert.ToInt32(ctrl.Name.Substring(1 , ctrl.Text.Length - 1));
+            index = Convert.ToInt32(ctrl.Name.Substring(1, ctrl.Text.Length - 1));
             Y_Bit[index] = !Y_Bit[index];
             //if (Y_Bit[index])
             //    ctrl.BackColor = Color.Lime;
@@ -1663,11 +1674,31 @@ namespace SimFBPLC
         private void btnOpenComm_Click(object sender, EventArgs e)
         {
             simPLC.Open();
+            if (simPLC.PLC_COM.IsOpen)
+            {
+                btnOpenComm.BackColor = Color.Lime;
+                btnCloseComm.BackColor = Color.LightGray;
+            }
+            else
+            {
+                btnCloseComm.BackColor = Color.Lime;
+                btnOpenComm.BackColor = Color.LightGray;
+            }
         }
 
         private void btnCloseComm_Click(object sender, EventArgs e)
         {
             simPLC.Close();
+            if (simPLC.PLC_COM.IsOpen)
+            {
+                btnOpenComm.BackColor = Color.Lime;
+                btnCloseComm.BackColor = Color.LightGray;
+            }
+            else
+            {
+                btnCloseComm.BackColor = Color.Lime;
+                btnOpenComm.BackColor = Color.LightGray;
+            }
         }
 
         private void btnReloadPLCIO_Click(object sender, EventArgs e)
@@ -1683,6 +1714,16 @@ namespace SimFBPLC
             simPLC.Close();
             simPLC.Port(cmoCommPort.SelectedItem.ToString());
             simPLC.Open();
+            if (simPLC.PLC_COM.IsOpen)
+            {
+                btnOpenComm.BackColor = Color.Lime;
+                btnCloseComm.BackColor = Color.LightGray;
+            }
+            else
+            {
+                btnCloseComm.BackColor = Color.Lime;
+                btnOpenComm.BackColor = Color.LightGray;
+            }
         }
 
         private void chkOnTop_Click(object sender, EventArgs e)
@@ -1827,6 +1868,10 @@ namespace SimFBPLC
         private void btnAction_Click(object sender, EventArgs e)
         {
             ActionFlag = !ActionFlag;
+            if (ActionFlag)
+                btnAction.BackColor = Color.Lime;
+            else
+                btnAction.BackColor = Color.LightGray;
         }
 
         private void btnReload_Click(object sender, EventArgs e)
@@ -1889,15 +1934,22 @@ namespace SimFBPLC
 
         public void TimeDelay(int t)
         {
-            Stopwatch WDog = new Stopwatch();
-            WDog.Restart();
+            int i;
+            for (i = 0; i < 10; i++)
+            {
+                if (!WDog[i].IsRunning)
+                {
+                    WDog[i].Restart();
+                    break;
+                }
+            }
             while (true)
             {
                 Application.DoEvents();
-                if (WDog.ElapsedMilliseconds > t)
+                if (WDog[i].ElapsedMilliseconds > t)
                     break;
             }
-            WDog.Stop();
+            WDog[i].Stop();
 
         }
         public string CheckSumFB(string sstr)
@@ -1996,6 +2048,10 @@ namespace SimFBPLC
                 {
                     if (M_Bit[i] != M_Bit_old[i])
                         UpdateM_Bit(i);
+                    if (M_Bit[35])
+                        btnPocketGood.BackColor = Color.Lime;
+                    else
+                        btnPocketGood.BackColor = Color.WhiteSmoke;
                 }
                 DataClone();
                 Thread.Sleep(100);
@@ -2054,9 +2110,36 @@ namespace SimFBPLC
                     M_Status[index].BackColor = Color.Lime;
                 else
                     M_Status[index].BackColor = Color.Red;
+                if (index == 35)
+                {
+                    if (M_Bit[35])
+                        btnPocketGood.BackColor = Color.Lime;
+                    else
+                        btnPocketGood.BackColor = Color.WhiteSmoke;
+                }
             }
-
         }
+
+        //private void UpdateRW_Writed(int index)
+        //{
+        //    if (R_Write[index].InvokeRequired)
+        //    {
+        //        R_Write[index].Invoke(new Action(() =>
+        //        {
+        //            UpdateRW_Writed(index);
+        //        }
+        //        ));
+        //    }
+        //    else
+        //    {
+        //        if (RR_Word[index])
+        //            R_Write[index].BackColor = Color.Lime;
+        //        else
+        //            RW_Status[index].BackColor = Color.Red;
+        //    }
+
+        //}
+
         private void WritePLCINI(string sfile)
         {
             WriteProgData("COMM_SETUP", "COMPORT", (cmoCommPort.SelectedIndex + 1).ToString(), sfile);
