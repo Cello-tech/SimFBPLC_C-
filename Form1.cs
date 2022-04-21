@@ -516,14 +516,22 @@ namespace SimFBPLC
                                 case "RR":
                                     {
                                         if (destindex - 1000 >= 0)
-                                            R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                        { 
+                                            //R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                            RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
+                                            //Debug.Print("R_Read[" + (destindex - 1000) + "].Text=" + R_Read[destindex - 1000].Text);
+                                            Debug.Print("RR_Word[" + (destindex - 1000) + "]=" + RR_Word[destindex - 1000]);
+                                        }
+
+                                        //RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
                                         break;
                                     }
 
                                 case "RW":
                                     {
                                         if (destindex - 1000 >= 0)
-                                            R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                            //R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                            RW_Word[destindex - 1100] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime);
                                         break;
                                     }
                             }
@@ -617,13 +625,15 @@ namespace SimFBPLC
 
                                 case "RR":
                                     {
-                                        R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                        //R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                        RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
                                         break;
                                     }
 
                                 case "RW":
                                     {
-                                        R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                        //R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                        RW_Word[destindex - 1100] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime);
                                         break;
                                     }
                             }
@@ -717,13 +727,15 @@ namespace SimFBPLC
 
                                 case "RR":
                                     {
-                                        R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                        //R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
+                                        RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
                                         break;
                                     }
 
                                 case "RW":
                                     {
-                                        R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                        //R_Write[destindex - 1100].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime).ToString();
+                                        RW_Word[destindex - 1100] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RW_Word[destindex - 1100], Target, istep, DTime);
                                         break;
                                     }
                             }
@@ -1253,7 +1265,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval);
                                             RR_Word[i + dStart - 1000] = tnum;
                                             RR_Word_Writed[i + dStart - 1000] = 1;
-                                            R_Read[i + dStart - 1000].Text = tnum.ToString();
+                                            //R_Read[i + dStart - 1000].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1268,7 +1280,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval);
                                             RR_Word[i + dStart - 1200 + 96] = tnum;
                                             RR_Word_Writed[i + dStart - 1200 + 96] = 1;
-                                            R_Read[i + dStart - 1200 + 96].Text = tnum.ToString();
+                                            //R_Read[i + dStart - 1200 + 96].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1283,7 +1295,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval, 16);
                                             RW_Word[i + dStart - 1100] = tnum;
                                             RW_Word_Writed[i + dStart - 1100] = 1;
-                                            R_Write[i + dStart - 1100].Text = tnum.ToString();
+                                            //R_Write[i + dStart - 1100].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1298,7 +1310,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval, 16);
                                             RW_Word[i + dStart - 1300 + 96] = tnum;
                                             RW_Word_Writed[i + dStart - 1300 + 96] = 1;
-                                            R_Write[i + dStart - 1300 + 96].Text = tnum.ToString();
+                                            //R_Write[i + dStart - 1300 + 96].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1663,8 +1675,8 @@ namespace SimFBPLC
         private void Timer2_Tick(System.Object sender, System.EventArgs e)
         {
             int i;
-            for (i = 0; i <= 191; i++)
-                RR_Word[i] = Convert.ToInt32(R_Read[i].Text);
+            //for (i = 0; i <= 191; i++)
+            //    RR_Word[i] = Convert.ToInt32(R_Read[i].Text);
             // WritePLCLog(".\PLCIOSAVE.INI")
             sComport = (cmoCommPort.SelectedIndex + 1).ToString();
             sCommSetting = txtCommSetting.Text;
@@ -2053,6 +2065,19 @@ namespace SimFBPLC
                     else
                         btnPocketGood.BackColor = Color.WhiteSmoke;
                 }
+                for (int i = 0; i <= 191; i++)
+                {
+                    if (RR_Word[i] != RR_Word_old[i])
+
+                        UpdateRR_Word(i);
+                }
+                for (int i = 0; i <= 191; i++)
+                {
+                    if (RW_Word[i] != RW_Word_old[i])
+
+                        UpdateRW_Word(i);
+                }
+
                 DataClone();
                 Thread.Sleep(100);
             }
@@ -2120,25 +2145,38 @@ namespace SimFBPLC
             }
         }
 
-        //private void UpdateRW_Writed(int index)
-        //{
-        //    if (R_Write[index].InvokeRequired)
-        //    {
-        //        R_Write[index].Invoke(new Action(() =>
-        //        {
-        //            UpdateRW_Writed(index);
-        //        }
-        //        ));
-        //    }
-        //    else
-        //    {
-        //        if (RR_Word[index])
-        //            R_Write[index].BackColor = Color.Lime;
-        //        else
-        //            RW_Status[index].BackColor = Color.Red;
-        //    }
+        private void UpdateRR_Word(int index)
+        {
+            if (R_Read[index].InvokeRequired)
+            {
+                R_Read[index].Invoke(new Action(() =>
+                {
+                    UpdateRR_Word(index);
+                }
+                ));
+            }
+            else
+            {
+                R_Read[index].Text = RR_Word[index].ToString();
+            }
 
-        //}
+        }
+        private void UpdateRW_Word(int index)
+        {
+            if (R_Write[index].InvokeRequired)
+            {
+                R_Write[index].Invoke(new Action(() =>
+                {
+                    UpdateRW_Word(index);
+                }
+                ));
+            }
+            else
+            {
+                R_Write[index].Text = R_Write[index].ToString();
+            }
+
+        }
 
         private void WritePLCINI(string sfile)
         {
