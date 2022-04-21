@@ -596,6 +596,7 @@ namespace SimFBPLC
             this.chkMtoY.TabIndex = 1;
             this.chkMtoY.Text = "M 記憶點輸出到Y";
             this.chkMtoY.UseVisualStyleBackColor = true;
+            this.chkMtoY.CheckedChanged += new System.EventHandler(this.chkMtoY_CheckedChanged);
             this.chkMtoY.Click += new System.EventHandler(this.chkMtoY_Click);
             // 
             // chkOnTop
@@ -608,6 +609,7 @@ namespace SimFBPLC
             this.chkOnTop.TabIndex = 1;
             this.chkOnTop.Text = "永遠在最上層";
             this.chkOnTop.UseVisualStyleBackColor = true;
+            this.chkOnTop.CheckedChanged += new System.EventHandler(this.chkOnTop_CheckedChanged);
             this.chkOnTop.Click += new System.EventHandler(this.chkOnTop_Click);
             // 
             // btnCloseComm

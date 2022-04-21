@@ -245,7 +245,7 @@ namespace SimFBPLC
             //Timer1.Enabled = true;
             FirstFlag = true;
             Timer2.Interval = 1000;
-            Timer2.Enabled = true;
+            //Timer2.Enabled = true;
 
             aa.Interval = 100;
             aa.SynchronizingObject = this;
@@ -1678,13 +1678,24 @@ namespace SimFBPLC
             //for (i = 0; i <= 191; i++)
             //    RR_Word[i] = Convert.ToInt32(R_Read[i].Text);
             // WritePLCLog(".\PLCIOSAVE.INI")
-            sComport = (cmoCommPort.SelectedIndex + 1).ToString();
-            sCommSetting = txtCommSetting.Text;
-            bTopmost = chkOnTop.Checked;
-            MtoY_Flag = chkMtoY.Checked;
+            //sComport = (cmoCommPort.SelectedIndex + 1).ToString();
+            //sCommSetting = txtCommSetting.Text;
+            //bTopmost = chkOnTop.Checked;
+            //MtoY_Flag = chkMtoY.Checked;
         }
         private void btnOpenComm_Click(object sender, EventArgs e)
         {
+            sCommSetting = txtCommSetting.Text;
+            try
+            {
+                simPLC.SetCommSetting(cmoCommPort.SelectedItem.ToString(), sCommSetting);
+            }
+            catch 
+            {
+                MessageBox.Show("通訊格式不對");
+                return;
+            }
+            
             simPLC.Open();
             if (simPLC.PLC_COM.IsOpen)
             {
@@ -1722,6 +1733,16 @@ namespace SimFBPLC
         {
             if (FirstFlag == false)
                 return;
+            sCommSetting = txtCommSetting.Text;
+            try
+            {
+                simPLC.SetCommSetting(cmoCommPort.SelectedItem.ToString(), sCommSetting);
+            }
+            catch
+            {
+                MessageBox.Show("通訊格式不對");
+                return;
+            }
             sComport = (cmoCommPort.SelectedIndex + 1).ToString();
             simPLC.Close();
             simPLC.Port(cmoCommPort.SelectedItem.ToString());
@@ -2082,6 +2103,17 @@ namespace SimFBPLC
                 Thread.Sleep(100);
             }
         }
+
+        private void chkMtoY_CheckedChanged(object sender, EventArgs e)
+        {
+            MtoY_Flag = chkMtoY.Checked;
+        }
+
+        private void chkOnTop_CheckedChanged(object sender, EventArgs e)
+        {
+            bTopmost = chkOnTop.Checked;
+        }
+
         private void UpdateX_Bit(int index)
         {
             if (X_Status[index].InvokeRequired)
