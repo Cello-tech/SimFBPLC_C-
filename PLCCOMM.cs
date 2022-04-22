@@ -111,7 +111,7 @@ namespace SimFBPLC
 
         public void SetTimerBit(bool On_cond, bool src_Cond, ref bool dest_Cond, bool set_cond, int TimeUp, bool pulse = true)
         {
-            Debug.Print("Control_State=" + Control_State);
+            //Debug.Print("Control_State=" + Control_State);
             switch (Control_State)
             {
                 case 0:

@@ -89,7 +89,7 @@ namespace SimFBPLC
         public bool PLC_DiDepSH;
         public bool PLC_DoPockInposition;
 
-        Stopwatch[] WDog = new Stopwatch[10];
+        public Stopwatch[] WDog = new Stopwatch[10];
         public bool ActionFlag;
         public int delay = 0;
         public bool threadStop = false;
@@ -111,6 +111,8 @@ namespace SimFBPLC
         public Form1()
         {
             InitializeComponent();
+            for (int i = 0; i < 10; i++)
+                WDog[i] = new Stopwatch();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -244,7 +246,7 @@ namespace SimFBPLC
             Timer1.Interval = 100;
             //Timer1.Enabled = true;
             FirstFlag = true;
-            Timer2.Interval = 1000;
+            Timer2.Interval = 100;
             //Timer2.Enabled = true;
 
             aa.Interval = 100;
@@ -501,9 +503,9 @@ namespace SimFBPLC
                                     {
                                         CSetTimer[i].SetTimerBit(ActionFlag, SrcBit, ref X_Bit[destindex], set_cond, DTime);
                                         string str = "CSetTimer[" + i + "].SetTimerBit(" + ActionFlag + "," + SrcBit + ", X_Bit[" + destindex + "]," + set_cond + "," + DTime + ")";
-                                        Debug.Print(str);
+                                        //Debug.Print(str);
                                         str = "X_Bit[" + destindex + "] =" + X_Bit[destindex];
-                                        Debug.Print(str);
+                                        //Debug.Print(str);
                                         break;
                                     }
 
@@ -516,11 +518,11 @@ namespace SimFBPLC
                                 case "RR":
                                     {
                                         if (destindex - 1000 >= 0)
-                                        { 
+                                        {
                                             //R_Read[destindex - 1000].Text = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime).ToString();
                                             RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
                                             //Debug.Print("R_Read[" + (destindex - 1000) + "].Text=" + R_Read[destindex - 1000].Text);
-                                            Debug.Print("RR_Word[" + (destindex - 1000) + "]=" + RR_Word[destindex - 1000]);
+                                            //Debug.Print("RR_Word[" + (destindex - 1000) + "]=" + RR_Word[destindex - 1000]);
                                         }
 
                                         //RR_Word[destindex - 1000] = CSetTimer[i].SetTimerBit2Word(ActionFlag, SrcBit, ref RR_Word[destindex - 1000], Target, istep, DTime);
@@ -828,8 +830,10 @@ namespace SimFBPLC
                 M_Bit[i] = Str2Bol(ReadProgData("PLC_M", "M" + i.ToString("D2"), "0", sfile));
                 RR_Word[i] = Convert.ToInt32(ReadProgData("PLC_RR", "R010" + i.ToString("D2"), "0", sfile));
                 R_Read[i].Text = RR_Word[i].ToString();
+                //Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
                 RW_Word[i] = Convert.ToInt32(ReadProgData("PLC_RW", "R011" + i.ToString("D2"), "0", sfile));
                 R_Write[i].Text = RW_Word[i].ToString();
+                //Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
             }
         }
         public bool Str2Bol(string sstr)
@@ -1682,6 +1686,11 @@ namespace SimFBPLC
             //sCommSetting = txtCommSetting.Text;
             //bTopmost = chkOnTop.Checked;
             //MtoY_Flag = chkMtoY.Checked;
+            for (i = 0; i < 5; i++)
+            { 
+                Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
+                Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
+            }
         }
         private void btnOpenComm_Click(object sender, EventArgs e)
         {
@@ -1690,12 +1699,12 @@ namespace SimFBPLC
             {
                 simPLC.SetCommSetting(cmoCommPort.SelectedItem.ToString(), sCommSetting);
             }
-            catch 
+            catch
             {
                 MessageBox.Show("通訊格式不對");
                 return;
             }
-            
+
             simPLC.Open();
             if (simPLC.PLC_COM.IsOpen)
             {
@@ -1967,6 +1976,7 @@ namespace SimFBPLC
 
         public void TimeDelay(int t)
         {
+            
             int i;
             for (i = 0; i < 10; i++)
             {
@@ -2205,7 +2215,7 @@ namespace SimFBPLC
             }
             else
             {
-                R_Write[index].Text = R_Write[index].ToString();
+                R_Write[index].Text = RW_Word[index].ToString();
             }
 
         }
