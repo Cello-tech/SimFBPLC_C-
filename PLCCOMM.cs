@@ -8,7 +8,7 @@ using System.Timers;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Diagnostics;
-
+using System.Threading;
 namespace SimFBPLC
 {
     public class Class_SetTimer
@@ -440,7 +440,7 @@ namespace SimFBPLC
             {
                 rstr = Rx_Buffer;
                 Rx_Buffer = "";
-                DataReceived?.Invoke(rstr);
+                DataReceived?.Invoke(rstr);                
             }
 
         }

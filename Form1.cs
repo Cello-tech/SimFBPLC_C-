@@ -37,22 +37,22 @@ namespace SimFBPLC
         public string RW_String;
         public string Output_String;
 
-        public static bool[] X_Bit = new bool[1000];
-        public static bool[] X_Bit_old = new bool[1000];
-        public static bool[] Y_Bit = new bool[1000];
-        public static bool[] Y_Bit_old = new bool[1000];
-        public static bool[] M_Bit = new bool[10000];
-        public static bool[] M_Bit_old = new bool[10000];
-        public static int[] RR_Word = new int[10000];
-        public static int[] RR_Word_old = new int[10000];
-        public static int[] RW_Word = new int[10000];
-        public static int[] RW_Word_old = new int[10000];
-        public static int[] RW_Word_Writed = new int[10000];
-        public static int[] RW_Word_Writed_old = new int[10000];
-        public static int[] RR_Word_Writed = new int[10000];
-        public static int[] RR_Word_Writed_old = new int[10000];
-        public static int[] DD_Word = new int[10000];
-        public static int[] DD_Word_old = new int[10000];
+        public bool[] X_Bit = new bool[1000];
+        public bool[] X_Bit_old = new bool[1000];
+        public bool[] Y_Bit = new bool[1000];
+        public bool[] Y_Bit_old = new bool[1000];
+        public bool[] M_Bit = new bool[10000];
+        public bool[] M_Bit_old = new bool[10000];
+        public int[] RR_Word = new int[10000];
+        public int[] RR_Word_old = new int[10000];
+        public int[] RW_Word = new int[10000];
+        public int[] RW_Word_old = new int[10000];
+        public int[] RW_Word_Writed = new int[10000];
+        public int[] RW_Word_Writed_old = new int[10000];
+        public int[] RR_Word_Writed = new int[10000];
+        public int[] RR_Word_Writed_old = new int[10000];
+        public int[] DD_Word = new int[10000];
+        public int[] DD_Word_old = new int[10000];
 
         public int index;
         public bool FirstFlag = false;
@@ -247,7 +247,7 @@ namespace SimFBPLC
             //Timer1.Enabled = true;
             FirstFlag = true;
             Timer2.Interval = 100;
-            //Timer2.Enabled = true;
+            Timer2.Enabled = true;
 
             aa.Interval = 100;
             aa.SynchronizingObject = this;
@@ -881,7 +881,6 @@ namespace SimFBPLC
             int dnum;
             string dev;
             int i = 0;
-
             string cmd = rstr.Substring(4 - 1, 2);
             switch (cmd)
             {
@@ -1686,11 +1685,12 @@ namespace SimFBPLC
             //sCommSetting = txtCommSetting.Text;
             //bTopmost = chkOnTop.Checked;
             //MtoY_Flag = chkMtoY.Checked;
-            for (i = 0; i < 5; i++)
-            { 
-                Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
-                Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
-            }
+            //for (i = 0; i < 5; i++)
+            //{ 
+            //    Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
+            //    Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
+            //}
+         
         }
         private void btnOpenComm_Click(object sender, EventArgs e)
         {
@@ -1798,7 +1798,7 @@ namespace SimFBPLC
                     ReadPLCIOName(ActionReadFileName);
                     ReadPLCLog(ActionReadFileName);
                 }
-            }
+            }          
         }
         public void LoadAction(out SAction[] SA, string sfile)
         {
@@ -2110,7 +2110,7 @@ namespace SimFBPLC
                 }
 
                 DataClone();
-                Thread.Sleep(100);
+                Thread.Sleep(100);                
             }
         }
 
@@ -2124,6 +2124,10 @@ namespace SimFBPLC
             bTopmost = chkOnTop.Checked;
         }
 
+        private void Button2_Click(object sender, EventArgs e)
+        {          
+        }
+
         private void UpdateX_Bit(int index)
         {
             if (X_Status[index].InvokeRequired)
@@ -2131,6 +2135,7 @@ namespace SimFBPLC
                 X_Status[index].Invoke(new Action(() =>
                 {
                     UpdateX_Bit(index);
+
                 }
                 ));
             }

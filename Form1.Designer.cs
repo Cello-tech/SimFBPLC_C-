@@ -222,6 +222,7 @@ namespace SimFBPLC
             this.Button2.Text = "上一頁";
             this.Button2.UseVisualStyleBackColor = true;
             this.Button2.Visible = false;
+            this.Button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // tabPageMOutput
             // 
