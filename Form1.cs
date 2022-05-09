@@ -12,12 +12,12 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
+
 namespace SimFBPLC
 {
     public partial class Form1 : Form
     {
-        public static Thread ProcessThread;
-
+        public static Thread ProcessThread; 
         public Button[] X_Status = new Button[1001];
         public Button[] Y_Status = new Button[1001];
         public Button[] M_Status = new Button[1001];
@@ -982,7 +982,7 @@ namespace SimFBPLC
                     {
                         dev = rstr.Substring(8 - 1, 1);
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 4));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2));
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
                         switch (dev)
                         {
                             case "M":
@@ -1016,7 +1016,7 @@ namespace SimFBPLC
                         dev = rstr.Substring(8 - 1, 1);
 
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 5));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2));
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
                         switch (dev)
                         {
                             case "D":
@@ -1135,7 +1135,7 @@ namespace SimFBPLC
                     {
                         dev = rstr.Substring(8 - 1, 1);
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 5));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2));
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
                         switch (dev)
                         {
                             case "D":
@@ -2061,6 +2061,7 @@ namespace SimFBPLC
             ProcessThread = new Thread(new ThreadStart(StatusThreading));
             ProcessThread.IsBackground = true;
             ProcessThread.Start();
+      
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -2112,8 +2113,7 @@ namespace SimFBPLC
                 DataClone();
                 Thread.Sleep(100);                
             }
-        }
-
+        }   
         private void chkMtoY_CheckedChanged(object sender, EventArgs e)
         {
             MtoY_Flag = chkMtoY.Checked;
