@@ -335,7 +335,7 @@ namespace SimFBPLC
                         istep = 1;
                 }
 
-                if (SA[i].TargetValue.Substring(1 - 1, 1) == "M" || SA[i].TargetValue.Substring(1 - 1, 1) == "D")
+                if (SA[i].TargetValue.Substring(1 - 1, 1) == "M" || SA[i].TargetValue.Substring(1 - 1, 1) == "D" || SA[i].TargetValue.Substring(1 - 1, 1) == "R")
                 {
                     Mux = Convert.ToInt32(SA[i].TargetValue.Substring(2 - 1, SA[i].TargetValue.Length - 1));
                     if (Mux <= 0)
