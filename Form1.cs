@@ -1927,7 +1927,7 @@ namespace SimFBPLC
 
             for (i = 0; i <= DataGridView1.RowCount - 1; i++)
             {
-                if (DataGridView1.Rows[i].Cells[0].Value.ToString() == null)
+                if (DataGridView1.Rows[i].Cells[0].Value == null)
                     break;
                 SA[i].Source = DataGridView1.Rows[i].Cells[0].Value.ToString();
                 SA[i].Method = DataGridView1.Rows[i].Cells[1].Value.ToString();
@@ -2066,6 +2066,7 @@ namespace SimFBPLC
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            threadStop = true;
             ReadPLCIOName(INIpath + "\\SIMFBPLC.INI");
             WritePLCLog(INIpath + "\\PLCIOSAVE.INI");
             //WritePLCINI(@".\SIMFBPLC.INI");

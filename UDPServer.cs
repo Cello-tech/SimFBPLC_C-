@@ -59,7 +59,6 @@ namespace SimFBPLC
                 int length = server.ReceiveFrom(buffer, ref point);//接收資料報
                 string message = Encoding.UTF8.GetString(buffer, 0, length);      
                 UPDDataReceived?.Invoke(message);//
-
             }
         }
         
