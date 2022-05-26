@@ -17,7 +17,7 @@ namespace SimFBPLC
 {
     public partial class Form1 : Form
     {
-        public static Thread ProcessThread; 
+        public static Thread ProcessThread;
         public Button[] X_Status = new Button[1001];
         public Button[] Y_Status = new Button[1001];
         public Button[] M_Status = new Button[1001];
@@ -982,7 +982,7 @@ namespace SimFBPLC
                     {
                         dev = rstr.Substring(8 - 1, 1);
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 4));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2), 16);
                         switch (dev)
                         {
                             case "M":
@@ -1016,7 +1016,7 @@ namespace SimFBPLC
                         dev = rstr.Substring(8 - 1, 1);
 
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 5));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2), 16);
                         switch (dev)
                         {
                             case "D":
@@ -1135,7 +1135,7 @@ namespace SimFBPLC
                     {
                         dev = rstr.Substring(8 - 1, 1);
                         dStart = Convert.ToInt32(rstr.Substring(9 - 1, 5));
-                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2),16);
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2), 16);
                         switch (dev)
                         {
                             case "D":
@@ -1298,7 +1298,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval, 16);
                                             RW_Word[i + dStart - 1100] = tnum;
                                             RW_Word_Writed[i + dStart - 1100] = 1;
-                                            //R_Write[i + dStart - 1100].Text = tnum.ToString();
+                                            R_Write[i + dStart - 1100].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1313,7 +1313,7 @@ namespace SimFBPLC
                                             tnum = Convert.ToInt16(devval, 16);
                                             RW_Word[i + dStart - 1300 + 96] = tnum;
                                             RW_Word_Writed[i + dStart - 1300 + 96] = 1;
-                                            //R_Write[i + dStart - 1300 + 96].Text = tnum.ToString();
+                                            R_Write[i + dStart - 1300 + 96].Text = tnum.ToString();
                                         }
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
@@ -1634,7 +1634,7 @@ namespace SimFBPLC
 
 
                     if (ActionFlag)
-                        R_Write[i].Text = RW_Word[i].ToString();
+                        R_Write[i].Text = RW_Word[i].ToString();                
                     if (RW_Word_Writed[i] > 0)
                     {
                         R_Write[i].BackColor = Color.Pink;
@@ -1690,7 +1690,7 @@ namespace SimFBPLC
             //    Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
             //    Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
             //}
-         
+
         }
         private void btnOpenComm_Click(object sender, EventArgs e)
         {
@@ -1798,7 +1798,7 @@ namespace SimFBPLC
                     ReadPLCIOName(ActionReadFileName);
                     ReadPLCLog(ActionReadFileName);
                 }
-            }          
+            }
         }
         public void LoadAction(out SAction[] SA, string sfile)
         {
@@ -1976,7 +1976,7 @@ namespace SimFBPLC
 
         public void TimeDelay(int t)
         {
-            
+
             int i;
             for (i = 0; i < 10; i++)
             {
@@ -2061,7 +2061,7 @@ namespace SimFBPLC
             ProcessThread = new Thread(new ThreadStart(StatusThreading));
             ProcessThread.IsBackground = true;
             ProcessThread.Start();
-      
+
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -2106,14 +2106,26 @@ namespace SimFBPLC
                 for (int i = 0; i <= 191; i++)
                 {
                     if (RW_Word[i] != RW_Word_old[i])
-
+                    {
                         UpdateRW_Word(i);
+                       
+                    }
+                    if (RW_Word_Writed[i] > 0)
+                    {
+                        R_Write[i].BackColor = Color.Pink;
+                        RW_Word_Writed[i] += 1;
+                        if (RW_Word_Writed[i] > 30)
+                        {
+                            RW_Word_Writed[i] = 0;
+                            R_Write[i].BackColor = Color.White;
+                        }
+                    }
                 }
 
                 DataClone();
-                Thread.Sleep(100);                
+                Thread.Sleep(100);
             }
-        }   
+        }
         private void chkMtoY_CheckedChanged(object sender, EventArgs e)
         {
             MtoY_Flag = chkMtoY.Checked;
@@ -2125,7 +2137,7 @@ namespace SimFBPLC
         }
 
         private void Button2_Click(object sender, EventArgs e)
-        {          
+        {
         }
 
         private void UpdateX_Bit(int index)
