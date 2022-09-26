@@ -829,8 +829,8 @@ namespace SimFBPLC
                 Y_Bit[i] = Str2Bol(ReadProgData("PLC_Y", "Y" + i.ToString("D2"), "0", sfile));
                 M_Bit[i] = Str2Bol(ReadProgData("PLC_M", "M" + i.ToString("D2"), "0", sfile));
                 RR_Word[i] = Convert.ToInt32(ReadProgData("PLC_RR", "R010" + i.ToString("D2"), "0", sfile));
-                R_Read[i].Text = RR_Word[i].ToString();
-                //Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
+                //R_Read[i].Text = RR_Word[i].ToString();
+                Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
                 RW_Word[i] = Convert.ToInt32(ReadProgData("PLC_RW", "R011" + i.ToString("D2"), "0", sfile));
                 R_Write[i].Text = RW_Word[i].ToString();
                 //Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
@@ -929,6 +929,7 @@ namespace SimFBPLC
                                     tstr = sstr + CheckSumFB(sstr) + ETX;
                                     // X_TEXT.Text = sstr
                                     TimeDelay(delay);
+                                    if(simPLC.PLC_COM.IsOpen)
                                     simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
@@ -948,7 +949,7 @@ namespace SimFBPLC
 
                                     // M_TEXT.Text = sstr
                                     TimeDelay(delay);
-
+                                    if(simPLC.PLC_COM.IsOpen)
                                     simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
@@ -968,8 +969,8 @@ namespace SimFBPLC
 
                                     // Y_TEXT.Text = sstr
                                     TimeDelay(delay);
-
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
                         }
@@ -1002,7 +1003,8 @@ namespace SimFBPLC
 
                                     TimeDelay(delay);
                                     // RR_TEXT.Text = sstr
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
                         }
@@ -1028,7 +1030,8 @@ namespace SimFBPLC
                                     sstr = STX + "01460" + astr;
                                     tstr = sstr + CheckSumFB(sstr) + ETX;
                                     TimeDelay(delay);
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
 
@@ -1123,6 +1126,7 @@ namespace SimFBPLC
                                     // End If
                                     TimeDelay(delay);
                                     // RW_TEXT.Text = sstr
+                                    if(simPLC.PLC_COM.IsOpen)
                                     simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
@@ -1252,7 +1256,8 @@ namespace SimFBPLC
                                     sstr = STX + "01470";
                                     tstr = sstr + CheckSumFB(sstr) + ETX;
                                     TimeDelay(delay);
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
 
@@ -1273,7 +1278,8 @@ namespace SimFBPLC
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
                                         TimeDelay(delay);
-                                        simPLC.PLC_COM.Write(tstr);
+                                        if (simPLC.PLC_COM.IsOpen)
+                                            simPLC.PLC_COM.Write(tstr);
                                     }
                                     else if (dStart >= 1200 & dStart < 1300)
                                     {
@@ -1288,7 +1294,8 @@ namespace SimFBPLC
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
                                         TimeDelay(delay);
-                                        simPLC.PLC_COM.Write(tstr);
+                                        if (simPLC.PLC_COM.IsOpen)
+                                            simPLC.PLC_COM.Write(tstr);
                                     }
                                     else if (dStart >= 1100 & dStart < 1200)
                                     {
@@ -1303,6 +1310,7 @@ namespace SimFBPLC
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
                                         TimeDelay(delay);
+                                        if(simPLC.PLC_COM.IsOpen)
                                         simPLC.PLC_COM.Write(tstr);
                                     }
                                     else if (dStart >= 1300 & dStart < 1400)
@@ -1318,7 +1326,8 @@ namespace SimFBPLC
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
                                         TimeDelay(delay);
-                                        simPLC.PLC_COM.Write(tstr);
+                                        if (simPLC.PLC_COM.IsOpen)
+                                            simPLC.PLC_COM.Write(tstr);
                                     }
 
                                     break;
@@ -1437,7 +1446,9 @@ namespace SimFBPLC
             if (e.KeyChar == System.Convert.ToChar(13))
             {
                 ctrl = (TextBox)sender;
-                index = Convert.ToInt32(ctrl.Name.Substring(5 - 1, 4));
+                int lenght = ctrl.Name.Length;
+                //index = Convert.ToInt32(ctrl.Name.Substring(5 - 1, 4));
+                index = Convert.ToInt32(ctrl.Name.Substring(5, lenght - 5));
                 RR_Word[index] = Convert.ToInt32(ctrl.Text);
             }
         }
@@ -1448,7 +1459,9 @@ namespace SimFBPLC
             if (e.KeyChar == System.Convert.ToChar(13))
             {
                 ctrl = (TextBox)sender;
-                index = Convert.ToInt32(ctrl.Name.Substring(6 - 1, 4));
+                int lenght = ctrl.Name.Length;
+                //index = Convert.ToInt32(ctrl.Name.Substring(6 - 1, 4));
+                index = Convert.ToInt32(ctrl.Name.Substring(5, lenght-5));
                 RW_Word[index] = Convert.ToInt32(ctrl.Text);
                 RW_Word_Writed[index] = 1;
                 R_Write[index].Text = ctrl.Text;
