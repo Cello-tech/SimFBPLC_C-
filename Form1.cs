@@ -21,8 +21,8 @@ namespace SimFBPLC
         public Button[] X_Status = new Button[1001];
         public Button[] Y_Status = new Button[1001];
         public Button[] M_Status = new Button[1001];
-        public TextBox[] R_Write = new TextBox[1001];
-        public TextBox[] R_Read = new TextBox[1001]; // 
+        public TextBox[] R_Write = new TextBox[1001];// show在程式中的Textbox
+        public TextBox[] R_Read = new TextBox[1001]; // 位址
         public TextBox X_TEXT;
         public TextBox Y_TEXT;
         public TextBox M_TEXT;
@@ -96,6 +96,7 @@ namespace SimFBPLC
         //public bool threadStop = false;
         System.Timers.Timer aa = new System.Timers.Timer();
         public SAction[] CAction = new SAction[301];
+        public ManyR[] manyR = new ManyR[30];
 
         public Class_SetTimer[] CSetTimer = new Class_SetTimer[301];
         [System.Runtime.InteropServices.DllImport("kernel32")]
@@ -111,8 +112,16 @@ namespace SimFBPLC
             InitializeComponent();
             for (int i = 0; i < 10; i++)
                 WDog[i] = new Stopwatch();
+            for (int i = 0; i < 30; i++)
+            {
+                manyR[i] = new ManyR();
+            }
         }
-
+        public class ManyR
+        {
+            public string R_ch;
+            public string R_Value;
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             if (UdpServer != null)
@@ -828,7 +837,7 @@ namespace SimFBPLC
                 M_Bit[i] = Str2Bol(ReadProgData("PLC_M", "M" + i.ToString("D2"), "0", sfile));
                 RR_Word[i] = Convert.ToInt32(ReadProgData("PLC_RR", "R010" + i.ToString("D2"), "0", sfile));
                 //R_Read[i].Text = RR_Word[i].ToString();
-                Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
+                //Debug.Print("R_Read[" + i + "]=" + R_Read[i].Text);
                 RW_Word[i] = Convert.ToInt32(ReadProgData("PLC_RW", "R011" + i.ToString("D2"), "0", sfile));
                 R_Write[i].Text = RW_Word[i].ToString();
                 //Debug.Print("R_Write[" + i + "]=" + R_Write[i].Text);
@@ -927,8 +936,8 @@ namespace SimFBPLC
                                     tstr = sstr + CheckSumFB(sstr) + ETX;
                                     // X_TEXT.Text = sstr
                                     TimeDelay(delay);
-                                    if(simPLC.PLC_COM.IsOpen)
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
 
@@ -947,8 +956,8 @@ namespace SimFBPLC
 
                                     // M_TEXT.Text = sstr
                                     TimeDelay(delay);
-                                    if(simPLC.PLC_COM.IsOpen)
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
 
@@ -1124,8 +1133,8 @@ namespace SimFBPLC
                                     // End If
                                     TimeDelay(delay);
                                     // RW_TEXT.Text = sstr
-                                    if(simPLC.PLC_COM.IsOpen)
-                                    simPLC.PLC_COM.Write(tstr);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
                         }
@@ -1308,8 +1317,8 @@ namespace SimFBPLC
                                         sstr = STX + "01470";
                                         tstr = sstr + CheckSumFB(sstr) + ETX;
                                         TimeDelay(delay);
-                                        if(simPLC.PLC_COM.IsOpen)
-                                        simPLC.PLC_COM.Write(tstr);
+                                        if (simPLC.PLC_COM.IsOpen)
+                                            simPLC.PLC_COM.Write(tstr);
                                     }
                                     else if (dStart >= 1300 & dStart < 1400)
                                     {
@@ -1328,6 +1337,54 @@ namespace SimFBPLC
                                             simPLC.PLC_COM.Write(tstr);
                                     }
 
+                                    break;
+                                }
+                        }
+                        TimeDelay(delay);
+                        break;
+                    }
+                case "49": // Write many Word    :
+                    {
+                        dev = rstr.Substring(8 - 1, 1);
+                        dStart = Convert.ToInt32(rstr.Substring(9 - 1, 5));
+                        dnum = Convert.ToInt16(rstr.Substring(6 - 1, 2), 16);
+                        switch (dev)
+                        {
+                            case "R":
+                                {
+                                    string[] trmp = new string[30];
+                                    //取個數
+                                    string num = rstr.Substring(5, 2);
+                                    int iNum = Convert.ToInt32(num, 16);
+
+                                    //開始切
+                                    for (int ii = 0; ii < iNum; ii++)
+                                    {
+                                        trmp[ii] = rstr.Substring(7+ 10 * ii, 10);
+
+                                        manyR[ii].R_ch = trmp[ii].Substring(2,4);                                        
+                                        manyR[ii].R_Value = trmp[ii].Substring(6, 4);
+
+                                        int intch = Convert.ToInt32(manyR[ii].R_ch);
+                                        int intval = Convert.ToInt32(manyR[ii].R_Value,16);
+                                        
+                                        if (intch >= 1300)
+                                        {
+                                        intch = intch - 1300 + 96;
+                                        }
+                                        else
+                                        {
+                                            intch = intch - 1100;
+                                        }
+                                        RW_Word_Writed[intch] = 1;
+                                        R_Write[intch].Text = intval.ToString();
+                                        RW_Word[intch] = intval;
+                                    }
+                                    sstr = STX + "01490";
+                                    tstr = sstr + CheckSumFB(sstr) + ETX;
+                                    TimeDelay(delay);
+                                    if (simPLC.PLC_COM.IsOpen)
+                                        simPLC.PLC_COM.Write(tstr);
                                     break;
                                 }
                         }
@@ -1459,7 +1516,7 @@ namespace SimFBPLC
                 ctrl = (TextBox)sender;
                 int lenght = ctrl.Name.Length;
                 //index = Convert.ToInt32(ctrl.Name.Substring(6 - 1, 4));
-                index = Convert.ToInt32(ctrl.Name.Substring(5, lenght-5));
+                index = Convert.ToInt32(ctrl.Name.Substring(5, lenght - 5));
                 RW_Word[index] = Convert.ToInt32(ctrl.Text);
                 RW_Word_Writed[index] = 1;
                 R_Write[index].Text = ctrl.Text;
@@ -1491,6 +1548,7 @@ namespace SimFBPLC
         {
             TextBox text = (TextBox)sender;
             lblRWName.Text = RW_Name[text.TabIndex];
+            //Debug.Print(text.Text);
         }
         private void X_Status_Click(object sender, System.EventArgs e)
         {
@@ -1562,6 +1620,7 @@ namespace SimFBPLC
                 M_Name[i] = ReadProgData("M_NAME", "lblM" + i.ToString("D2"), "No Define", sfile);
                 RR_Name[i] = ReadProgData("RR_NAME", "txtRR" + i.ToString("D2"), "No Define", sfile);
                 RW_Name[i] = ReadProgData("RW_NAME", "txtRW" + i.ToString("D2"), "No Define", sfile);
+                //Debug.Print(RW_Name[i]);
             }
         }
         private void LinkToolTiptext()
@@ -1645,7 +1704,7 @@ namespace SimFBPLC
 
 
                     if (ActionFlag)
-                        R_Write[i].Text = RW_Word[i].ToString();                
+                        R_Write[i].Text = RW_Word[i].ToString();
                     if (RW_Word_Writed[i] > 0)
                     {
                         R_Write[i].BackColor = Color.Pink;
@@ -2120,7 +2179,7 @@ namespace SimFBPLC
                     if (RW_Word[i] != RW_Word_old[i])
                     {
                         UpdateRW_Word(i);
-                       
+
                     }
                     if (RW_Word_Writed[i] > 0)
                     {
