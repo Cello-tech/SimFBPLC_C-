@@ -1901,9 +1901,7 @@ namespace SimFBPLC
                         SA[i].TargetValue = bstr[4];
                     DataGridView1.Rows.Add(SA[i].Source, SA[i].Method, SA[i].Dest, SA[i].Delay, SA[i].TargetValue);
                 }
-
-                i += 1;
-            }
+                i += 1;            }
             while (true);
         }
 
@@ -1923,7 +1921,6 @@ namespace SimFBPLC
         }
         public void SaveAction(SAction[] SA, string sfile)
         {
-
             int i;
             string astr;
 
@@ -2070,8 +2067,8 @@ namespace SimFBPLC
             int iCheckSum;
             string sCheckSum;
 
-            //iCheckSum = 0;
-            iCheckSum = 2;
+            iCheckSum = 0;
+            //iCheckSum = 2;
             for (int i = 1; i <= sstr.Length; i++)
             {
 
@@ -2082,7 +2079,6 @@ namespace SimFBPLC
             }
             //sCheckSum = Strings.Right(iCheckSum.ToString ("X"), 2);
             sCheckSum = iCheckSum.ToString("X").Substring(iCheckSum.ToString("X").Length - 2, 2);
-
 
             if (sCheckSum.Length < 2)
                 sCheckSum = "0" + sCheckSum;
